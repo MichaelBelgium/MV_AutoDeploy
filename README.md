@@ -13,7 +13,7 @@ But to get this to work perfectly you'll need to follow the steps below.
 * Do a first `git add .` and `git commit -m "Initial commit"` and `git push origin master` so you have your current version of the gamemode on your origin (aka bitbucket/github)
 
 ### Vps
-* Put deploy.php on your webserver on the vps
+* Edit the Config class in deploy.php so it would work for you. Afterwards put deploy.php on the webserver on your vps.
 * Add a webhook to the github/bitbucket page: repo settings > webhooks > add webhook; title free to choose, url should be `http://vps_ip_or_domain.tld/deploy.php`
 * Create an empty git repo in your server gamemode directory: `cd /home/samp/myserver/gamemodes && git init`
 * Same like locally, add the git remote link: `git remote add <link>` - yes the same one
