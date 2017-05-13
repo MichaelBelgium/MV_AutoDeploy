@@ -78,12 +78,14 @@ CMD:updates(playerid,params[])
 {
 	new updates[256*5],string[128], Cache:result, rows = 0;
 	new data[4][64];
-	result = mysql_query(g_SQL, "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT 10");
+	result = mysql_query(g_SQL, "SELECT uID FROM Update_Data");
 	rows = cache_num_rows(g_SQL);
+	cache_delete(result, g_SQL);
+
+	result = mysql_query(g_SQL, "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT 10");
 
 	format(string, sizeof(string), "{FFFFFF}There are a total of %i updates.\n\n", rows);
 	strcat(updates, string);
-
 	if(rows > 0)
 	{
 		for(new i = 0; i < rows; i++)
