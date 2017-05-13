@@ -24,13 +24,10 @@ But to get this to work perfectly you'll need to follow the steps below.
 * Add `[MV]_AutoDeploy` on the filterscripts line in `server.cfg`
 * In general: the requirements are the SQL plugin and zcmd include.
 
-
-
-
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
 ## /updates
 
 **[MV]_AutoDeploy gives you one more command: /updates - Lists the last 10 updates from the server/git**
 
-![updates command](https://puu.sh/vOUOW.jpg)
+![updates command](http://puu.sh/vOVWv.jpg)

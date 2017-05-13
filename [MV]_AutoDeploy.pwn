@@ -2,14 +2,17 @@
 #include <zcmd>
 #include <a_mysql>
 
-#define CHECK_UPDATE	1						//check every x minutes for update
-#define FILE_NAME 		"lastupdatehash.txt" 	//the file where to put the last hash update in
-#define DIALOG_NORESPONSE	898					//choose a dialogid without response
+#define CHECK_UPDATE		30						//check every x minutes for update
+#define FILE_NAME 			"lastupdatehash.txt" 	//the file where to put the last hash update in
+#define DIALOG_NORESPONSE	898						//choose a dialogid without response
 
 #define SQL_PASSWORD    ""
 #define SQL_USER        ""
 #define SQL_DB          ""
 #define SQL_SERVER      "127.0.0.1"
+
+#define COL_PARAM   	"{AFE7FF}"
+#define COL_SERVER      "{3FCD02}"
 
 new g_SQL = -1, g_Timer;
 
@@ -73,7 +76,7 @@ public CheckServerUpdate()
 
 CMD:updates(playerid,params[])
 {
-	new updates[256*3],string[128], Cache:result, rows = 0;
+	new updates[256*5],string[128], Cache:result, rows = 0;
 	new data[4][64];
 	result = mysql_query(g_SQL, "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT 10");
 	rows = cache_num_rows(g_SQL);
@@ -93,9 +96,9 @@ CMD:updates(playerid,params[])
 			cache_get_field_content(i, "Branch", data[3], g_SQL);
 
 			if(!strcmp(data[3], "master", true))
-				format(string, sizeof(string), "[%s] '%s' at %s\n", data[0], data[1], data[2]);
+				format(string, sizeof(string), "{FFFFFF}[%s] "COL_SERVER"'%s' {FFFFFF}at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 			else
-				format(string, sizeof(string), "\t[%s] '%s' at %s\n", data[0], data[1], data[2]);
+				format(string, sizeof(string), "\t{FFFFFF}[%s] "COL_SERVER"'%s' {FFFFFF}at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 
 			strcat(updates, string);
 		}
