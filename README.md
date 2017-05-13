@@ -1,6 +1,6 @@
 # SAMP-Auto-Update-Git
 
-This is a way to auto-deploy a server (gamemode) to your VPS. When pushing to bitbucket (or github) it'll automaticly update the gamemode files on the vps thanks to a webhook.
+This is a way to auto-deploy a server (gamemode) to your VPS. When pushing to bitbucket (or github) it'll automaticly update the gamemode files on the vps thanks to a webhook. If the sa-mp server detects there's an update (that you pushed to the master branch) - the server will restart itself (with gmx). 
 But to get this to work perfectly you'll need to follow the steps below.
 
 ## Setup
@@ -19,4 +19,18 @@ But to get this to work perfectly you'll need to follow the steps below.
 * Create an empty git repo in your server gamemode directory: `cd /home/samp/myserver/gamemodes && git init`
 * Same like locally, add the git remote link: `git remote add <link>` - yes the same one
 
-Follow these in order, first we set up things locally then on vps. After these steps you should be good to go.
+### Server
+* Put `[MV]_AutoDeploy` in your filterscripts folder on your vps
+* Add `[MV]_AutoDeploy` on the filterscripts line in `server.cfg`
+* In general: the requirements are the SQL plugin and zcmd include.
+
+
+
+
+Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
+
+## /updates
+
+**[MV]_AutoDeploy gives you one more command: /updates - Lists the last 10 updates from the server/git**
+
+![updates command](https://puu.sh/vOUOW.jpg)
