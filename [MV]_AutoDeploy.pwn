@@ -3,16 +3,18 @@
 #include <a_mysql>
 
 #define CHECK_UPDATE		30						//check every x minutes for update
-#define FILE_NAME 			"lastupdatehash.txt" 	//the file where to put the last hash update in
+#define FILE_NAME			"lastupdatehash.txt" 	//the file where to put the last hash update in
 #define DIALOG_NORESPONSE	898						//choose a dialogid without response
+#define UPDATES_LIMIT		10						//Last x commits will be shown in /updates
 
 #define SQL_PASSWORD    ""
 #define SQL_USER        ""
 #define SQL_DB          ""
 #define SQL_SERVER      "127.0.0.1"
 
-#define COL_PARAM   	"{AFE7FF}"
-#define COL_SERVER      "{3FCD02}"
+#define COL_PARAM		"{AFE7FF}"
+#define COL_SERVER		"{3FCD02}"
+#define COL_WHITE		"{FFFFFF}"
 
 new g_SQL = -1, g_Timer;
 
@@ -76,19 +78,23 @@ public CheckServerUpdate()
 
 CMD:updates(playerid,params[])
 {
-	new updates[256*5],string[128], Cache:result, rows = 0;
+	new updates[256*5],string[128], Cache:result, rows[2];
 	new data[4][64];
+
 	result = mysql_query(g_SQL, "SELECT uID FROM Update_Data");
-	rows = cache_num_rows(g_SQL);
+	rows[0] = cache_num_rows(g_SQL);
 	cache_delete(result, g_SQL);
 
-	result = mysql_query(g_SQL, "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT 10");
+	mysql_format(g_SQL,string, sizeof(string), "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT %i", UPDATES_LIMIT);
+	result = mysql_query(g_SQL, string);
+	rows[1] = cache_num_rows(g_SQL);
 
-	format(string, sizeof(string), "{FFFFFF}There are a total of %i updates.\n\n", rows);
+	format(string, sizeof(string), "There are a total of %i updates.\n\n", rows[0]);
 	strcat(updates, string);
-	if(rows > 0)
+
+	if(rows[1] > 0)
 	{
-		for(new i = 0; i < rows; i++)
+		for(new i = 0; i < rows[1]; i++)
 		{
 			cache_get_field_content(i, "Hash", data[0], g_SQL);
 			strmid(data[0], data[0], 0, 7);
