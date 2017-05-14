@@ -89,7 +89,7 @@ CMD:updates(playerid,params[])
 	result = mysql_query(g_SQL, string);
 	rows[1] = cache_num_rows(g_SQL);
 
-	format(string, sizeof(string), "There are a total of %i updates.\n\n", rows[0]);
+	format(string, sizeof(string), COL_WHITE"There are a total of %i updates.\n\n", rows[0]);
 	strcat(updates, string);
 
 	if(rows[1] > 0)
@@ -104,9 +104,9 @@ CMD:updates(playerid,params[])
 			cache_get_field_content(i, "Branch", data[3], g_SQL);
 
 			if(!strcmp(data[3], "master", true))
-				format(string, sizeof(string), "{FFFFFF}[%s] "COL_SERVER"'%s' {FFFFFF}at "COL_PARAM"%s\n", data[0], data[1], data[2]);
+				format(string, sizeof(string), COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 			else
-				format(string, sizeof(string), "\t{FFFFFF}[%s] "COL_SERVER"'%s' {FFFFFF}at "COL_PARAM"%s\n", data[0], data[1], data[2]);
+				format(string, sizeof(string), "\t"COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 
 			strcat(updates, string);
 		}
