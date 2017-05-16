@@ -27,7 +27,7 @@ But to get this to work perfectly you'll need to follow the steps below.
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
 ## To-do
-* Add github webhook support (deploy.php is only meant for bitbucket for now)
+-
 
 ## /updates
 
