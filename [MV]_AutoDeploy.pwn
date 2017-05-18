@@ -112,7 +112,8 @@ CMD:updates(playerid,params[])
 
 			strcat(updates, string);
 
-			format(last_branch, sizeof(last_branch), "%s", data[3]);
+			if(i == 0)
+				format(last_branch, sizeof(last_branch), "%s", data[3]);
 		}
 
 		if(strcmp(last_branch, "master", true) != 0)
