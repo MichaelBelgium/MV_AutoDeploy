@@ -78,7 +78,7 @@ public CheckServerUpdate()
 
 CMD:updates(playerid,params[])
 {
-	new updates[256*5],string[128], Cache:result, rows[2];
+	new updates[256*5],string[128], Cache:result, rows[2], last_branch[32];
 	new data[4][64];
 
 	result = mysql_query(g_SQL, "SELECT uID FROM Update_Data");
@@ -91,6 +91,8 @@ CMD:updates(playerid,params[])
 
 	format(string, sizeof(string), COL_WHITE"There are a total of %i updates.\n\n", rows[0]);
 	strcat(updates, string);
+
+	rows[0] = strlen(string);
 
 	if(rows[1] > 0)
 	{
@@ -109,7 +111,12 @@ CMD:updates(playerid,params[])
 				format(string, sizeof(string), "\t"COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 
 			strcat(updates, string);
+
+			format(last_branch, sizeof(last_branch), "%s", data[3]);
 		}
+
+		if(strcmp(last_branch, "master", true) != 0)
+			strins(updates, "{3FA3C4}Update in development:\n", rows[0]);
 
 		ShowPlayerDialog(playerid, DIALOG_NORESPONSE, DIALOG_STYLE_MSGBOX, "Update log", updates, "OK", "");
 	}
