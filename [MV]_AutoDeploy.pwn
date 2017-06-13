@@ -7,16 +7,16 @@
 #define DIALOG_NORESPONSE	898						//choose a dialogid without response
 #define UPDATES_LIMIT		10						//Last x commits will be shown in /updates
 
-#define SQL_PASSWORD    ""
-#define SQL_USER        ""
-#define SQL_DB          ""
-#define SQL_SERVER      "127.0.0.1"
+#define SQL_PASSWORD    	""
+#define SQL_USER        	""
+#define SQL_DB          	""
+#define SQL_SERVER      	"127.0.0.1"
 
-#define COL_PARAM		"{AFE7FF}"
-#define COL_SERVER		"{3FCD02}"
-#define COL_WHITE		"{FFFFFF}"
+#define COL_PARAM			"{AFE7FF}"
+#define COL_SERVER			"{3FCD02}"
+#define COL_WHITE			"{FFFFFF}"
 
-new g_SQL = -1, g_Timer;
+new g_SQL = -1, g_Timer, g_CurrentHash[128], File:HashFile;
 
 forward CheckServerUpdate();
 
@@ -29,6 +29,16 @@ public OnFilterScriptInit()
 
 	g_Timer = SetTimer("CheckServerUpdate", CHECK_UPDATE*60000, true);
 
+	HashFile = fopen(FILE_NAME);
+	if(HashFile)
+	{
+		new length = fread(HashFile, g_CurrentHash);
+		
+		if(length == 0)
+			g_CurrentHash = "nohashyet";
+	}
+
+	fclose(HashFile);
 	return 1;
 }
 
@@ -41,23 +51,17 @@ public OnFilterScriptExit()
 
 public CheckServerUpdate()
 {
-	new string[256], hash[2][128], tmp[128];
-
-	new File:handle = fopen(FILE_NAME);
-	if(handle)
-		fread(handle, hash[0]);
-
-	fclose(handle);
+	new string[256], hash[128], tmp[128];
 
 	new Cache:result = mysql_query(g_SQL, "SELECT Hash, Message FROM Update_Data WHERE Branch = 'master' ORDER BY Date DESC LIMIT 1");
 	if(cache_num_rows(g_SQL) == 1)
 	{
-		cache_get_field_content(0, "Hash", hash[1], g_SQL);
+		cache_get_field_content(0, "Hash", hash, g_SQL);
 		cache_get_field_content(0, "Message", tmp, g_SQL);
 
 		cache_delete(result, g_SQL);
 		
-		if(!strcmp(hash[0],hash[1],false))
+		if(!strcmp(g_CurrentHash,hash,false))
 			print("No new updates available");
 		else
 		{
@@ -67,9 +71,11 @@ public CheckServerUpdate()
 
 			fremove(FILE_NAME);
 
-			handle = fopen(FILE_NAME);
-			fwrite(handle, hash[1]);
-			fclose(handle);
+			HashFile = fopen(FILE_NAME);
+			fwrite(HashFile, hash);
+			fclose(HashFile);
+
+			format(g_CurrentHash, sizeof(g_CurrentHash), "%s", hash);
 
 			SendRconCommand("gmx");
 		}
@@ -127,4 +133,3 @@ CMD:updates(playerid,params[])
 	cache_delete(result, g_SQL);
 	return 1;
 }
-
