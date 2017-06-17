@@ -3,7 +3,6 @@
 #include <a_mysql>
 
 #define CHECK_UPDATE		30						//check every x minutes for update
-#define FILE_NAME			"lastupdatehash.txt" 	//the file where to put the last hash update in
 #define DIALOG_NORESPONSE	898						//choose a dialogid without response
 #define UPDATES_LIMIT		10						//Last x commits will be shown in /updates
 
@@ -16,7 +15,7 @@
 #define COL_SERVER			"{3FCD02}"
 #define COL_WHITE			"{FFFFFF}"
 
-new g_SQL = -1, g_Timer, g_CurrentHash[128], File:HashFile;
+new g_SQL = -1, g_Timer;
 
 forward CheckServerUpdate();
 
@@ -28,17 +27,6 @@ public OnFilterScriptInit()
 	if(mysql_errno(g_SQL) != 0)	printf("Could not connect to database %s!", SQL_DB);
 
 	g_Timer = SetTimer("CheckServerUpdate", CHECK_UPDATE*60000, true);
-
-	HashFile = fopen(FILE_NAME);
-	if(HashFile)
-	{
-		new length = fread(HashFile, g_CurrentHash);
-		
-		if(length == 0)
-			g_CurrentHash = "nohashyet";
-	}
-
-	fclose(HashFile);
 	return 1;
 }
 
@@ -51,34 +39,25 @@ public OnFilterScriptExit()
 
 public CheckServerUpdate()
 {
-	new string[256], hash[128], tmp[128];
+	new string[256], hash[128], tmp[128], id;
 
-	new Cache:result = mysql_query(g_SQL, "SELECT Hash, Message FROM Update_Data WHERE Branch = 'master' ORDER BY Date DESC LIMIT 1");
+	new Cache:result = mysql_query(g_SQL, "SELECT uID, Hash, Message FROM Update_Data WHERE Branch = 'master' ORDER BY Date DESC LIMIT 1");
 	if(cache_num_rows(g_SQL) == 1)
 	{
+		id = cache_get_field_content_int(0, "uID", g_SQL);
 		cache_get_field_content(0, "Hash", hash, g_SQL);
 		cache_get_field_content(0, "Message", tmp, g_SQL);
 
 		cache_delete(result, g_SQL);
 		
-		if(!strcmp(g_CurrentHash,hash,false))
-			print("No new updates available");
-		else
-		{
-			format(string, sizeof(string),"New update available: %s - Server restarting ...", tmp);
-			SendClientMessageToAll(-1, string);
-			print(string);
+		format(string, sizeof(string),"New update available: %s - Server restarting ...", tmp);
+		SendClientMessageToAll(-1, string);
+		print(string);
 
-			fremove(FILE_NAME);
+		mysql_format(g_SQL, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);
+		mysql_tquery(g_SQL, string);
 
-			HashFile = fopen(FILE_NAME);
-			fwrite(HashFile, hash);
-			fclose(HashFile);
-
-			format(g_CurrentHash, sizeof(g_CurrentHash), "%s", hash);
-
-			SendRconCommand("gmx");
-		}
+		SendRconCommand("gmx");
 	}
 }
 
