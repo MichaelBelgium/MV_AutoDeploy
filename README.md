@@ -27,7 +27,7 @@ But to get this to work perfectly you'll need to follow the steps below.
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
 ## To-do
--
+- Add git issues feature if people want to use it as bug/suggestion "tracker"
 
 ## /updates
 

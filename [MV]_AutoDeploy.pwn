@@ -39,26 +39,31 @@ public OnFilterScriptExit()
 
 public CheckServerUpdate()
 {
-	new string[256], hash[128], tmp[128], id;
+	new string[256], hash[128], msg[128], id;
 
-	new Cache:result = mysql_query(g_SQL, "SELECT uID, Hash, Message FROM Update_Data WHERE Branch = 'master' ORDER BY Date DESC LIMIT 1");
-	if(cache_num_rows(g_SQL) == 1)
+	new Cache:result = mysql_query(g_SQL, "SELECT uID, Hash, Message FROM Update_Data WHERE Branch = 'master' AND Handled = 0 ORDER BY Date DESC LIMIT 1");
+	new rows = cache_num_rows(g_SQL);
+	if(rows > 0)
 	{
-		id = cache_get_field_content_int(0, "uID", g_SQL);
-		cache_get_field_content(0, "Hash", hash, g_SQL);
-		cache_get_field_content(0, "Message", tmp, g_SQL);
+		for(new i = 0; i < rows; i++)
+		{
+			id = cache_get_field_content_int(i, "uID", g_SQL);
+			cache_get_field_content(i, "Hash", hash, g_SQL);
+			cache_get_field_content(i, "Message", msg, g_SQL);
 
-		cache_delete(result, g_SQL);
-		
-		format(string, sizeof(string),"New update available: %s - Server restarting ...", tmp);
-		SendClientMessageToAll(-1, string);
-		print(string);
+			format(string, sizeof(string),"New update available: %s", msg);
+			SendClientMessageToAll(-1, string);
+			print(string);
 
-		mysql_format(g_SQL, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);
-		mysql_tquery(g_SQL, string);
+			mysql_format(g_SQL, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);
+			mysql_query(g_SQL, string, false);
+		}
 
+		SendClientMessageToAll(-1, "Server restarting ...");
 		SendRconCommand("gmx");
 	}
+
+	cache_delete(result, g_SQL);
 }
 
 CMD:updates(playerid,params[])
