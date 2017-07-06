@@ -20,8 +20,12 @@ But to get this to work perfectly you'll need to follow the steps below.
 * Same like locally, add the git remote link: `git remote add <link>` - yes the same one
 
 ### Server
-* Put `[MV]_AutoDeploy` in your filterscripts folder on your vps
-* Add `[MV]_AutoDeploy` on the filterscripts line in `server.cfg`
+* Download `MV_AutoDeploy` in your includes folder
+* Put `#include <MV_AutoDeploy>` in your gamemode or filterscript.
+* U can use the following callbacks like the example script (`serverexample.pwn`)
+```
+OnServerUpdateDetected(id, hash[], shorthash[], message[])
+```
 * In general: the requirements are the SQL plugin and zcmd include.
 
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
