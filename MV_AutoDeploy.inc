@@ -1,6 +1,7 @@
 #include <a_samp>
 #include <zcmd>
 #include <a_mysql>
+#include <sscanf2>
 
 #define CHECK_UPDATE		1		//check every x minutes for update
 #define MV_DIALOG			898		//choose a dialogid without response
@@ -12,8 +13,19 @@
 
 new gConnection = -1, gTimer = -1;
 
+enum
+{
+	SERVER_UPDATE,
+	SERVER_UPDATE_DEV,
+	SERVER_ISSUE,
+	SERVER_ISSUE_STATUSCHANGE
+};
+
 forward CheckServerUpdate();
-forward OnServerUpdateDetected(id, hash[], shorthash[], message[]);
+forward OnServerUpdateDetected(updateid, hash[], shorthash[], message[]);
+forward OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[]);
+forward OnServerIssueCreated(issueid, title[], priority[], kind[]);
+forward OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[]);
 
 MV_AutoDeployInit(sqlCon)
 {
@@ -29,10 +41,11 @@ MV_AutoDeployExit()
 
 public CheckServerUpdate()
 {
-	new string[256], hash[128], shash[16], msg[128], id;
+	new string[256], hash[128], shash[16], msg[128], id, type, bool:needsrestart = false;
 
-	new Cache:result = mysql_query(gConnection, "SELECT uID, Hash, Message FROM Update_Data WHERE Branch = 'master' AND Handled = 0 ORDER BY Date DESC");
+	new Cache:result = mysql_query(gConnection, "SELECT uID, Hash, Type, Message FROM Update_Data WHERE Handled = 0 ORDER BY Date DESC");
 	new rows = cache_num_rows(gConnection);
+
 	if(rows > 0)
 	{
 		for(new i = 0; i < rows; i++)
@@ -40,16 +53,40 @@ public CheckServerUpdate()
 			id = cache_get_field_content_int(i, "uID", gConnection);
 			cache_get_field_content(i, "Hash", hash, gConnection);
 			cache_get_field_content(i, "Message", msg, gConnection);
+			type = cache_get_field_content_int(i, "Type", gConnection);
 			strmid(shash, hash, 0, 7);
 
-			CallLocalFunction("OnServerUpdateDetected", "isss", id, hash, shash, msg);
-
+			switch(type)
+			{
+				case SERVER_UPDATE:
+				{
+					CallLocalFunction("OnServerUpdateDetected", "isss", id, hash, shash, msg);
+					needsrestart = true;
+				}
+				case SERVER_UPDATE_DEV: CallLocalFunction("OnUpcomingUpdateDetected", "isss", id, hash, shash, msg);
+				case SERVER_ISSUE: 
+				{
+					new issueid, priority[16], kind[16];
+					sscanf(hash, "p</>is[16]s[16]", issueid, priority, kind);
+					CallLocalFunction("OnServerIssueCreated", "isss", issueid, msg, priority, kind);
+				}
+				case SERVER_ISSUE_STATUSCHANGE:
+				{
+					new issueid, oldstatus[16], newstatus[16];
+					sscanf(hash, "p</>is[16]s[16]", issueid, newstatus, oldstatus);
+					CallLocalFunction("OnServerIssueStatusChange", "isss", issueid, msg, oldstatus, newstatus);
+				}
+			}
+			
 			mysql_format(gConnection, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);
 			mysql_query(gConnection, string, false);
 		}
 
-		SendClientMessageToAll(-1, "Server restarting ...");
-		SendRconCommand("gmx");
+		if(needsrestart)
+		{
+			SendClientMessageToAll(-1, "Server restarting ...");
+			SendRconCommand("gmx");
+		}
 	}
 	else
 		print("No new updates.");
