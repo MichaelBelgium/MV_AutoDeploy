@@ -3,7 +3,7 @@
 #include <a_mysql>
 #include <sscanf2>
 
-#define CHECK_UPDATE		1		//check every x minutes for update
+#define CHECK_UPDATE		30		//check every x minutes for update
 #define MV_DIALOG			898		//choose a dialogid without response
 #define UPDATES_LIMIT		10		//Last x commits will be shown in /updates
 
@@ -96,46 +96,43 @@ public CheckServerUpdate()
 
 CMD:updates(playerid,params[])
 {
-	new updates[256*5],string[128], Cache:result, rows[2], last_branch[32];
-	new data[4][64];
+	new updates[256*5],string[128], Cache:result, totalrows, updaterows, last_type;
+	new data[3][64], length = 0;
 
-	result = mysql_query(gConnection, "SELECT uID FROM Update_Data");
-	rows[0] = cache_num_rows(gConnection);
+	result = mysql_query(gConnection, "SELECT uID FROM Update_Data WHERE Type = 0 OR Type = 1");
+	totalrows = cache_num_rows(gConnection);
 	cache_delete(result, gConnection);
 
-	mysql_format(gConnection,string, sizeof(string), "SELECT * FROM Update_Data ORDER BY Date DESC LIMIT %i", UPDATES_LIMIT);
+	mysql_format(gConnection,string, sizeof(string), "SELECT * FROM Update_Data WHERE Type = 0 OR Type = 1 ORDER BY Date DESC LIMIT %i", UPDATES_LIMIT);
 	result = mysql_query(gConnection, string);
-	rows[1] = cache_num_rows(gConnection);
+	updaterows = cache_num_rows(gConnection);
 
-	format(string, sizeof(string), COL_WHITE"There are a total of %i updates.\n\n", rows[0]);
+	format(string, sizeof(string), COL_WHITE"There are a total of %i updates.\n\n", totalrows);
 	strcat(updates, string);
 
-	rows[0] = strlen(string);
+	length = strlen(string);
 
-	if(rows[1] > 0)
+	if(updaterows > 0)
 	{
-		for(new i = 0; i < rows[1]; i++)
+		for(new i = 0; i < updaterows; i++)
 		{
 			cache_get_field_content(i, "Hash", data[0], gConnection);
 			strmid(data[0], data[0], 0, 7);
 
 			cache_get_field_content(i, "Message", data[1], gConnection);
 			cache_get_field_content(i, "Date", data[2], gConnection);
-			cache_get_field_content(i, "Branch", data[3], gConnection);
+			last_type = cache_get_field_content_int(i, "Type", gConnection);
 
-			if(!strcmp(data[3], "master", true))
+			if(last_type == SERVER_UPDATE)
 				format(string, sizeof(string), COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 			else
 				format(string, sizeof(string), "\t"COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
 
 			strcat(updates, string);
-
-			if(i == 0)
-				format(last_branch, sizeof(last_branch), "%s", data[3]);
 		}
 
-		if(strcmp(last_branch, "master", true) != 0)
-			strins(updates, "{3FA3C4}Update in development:\n", rows[0]);
+		if(last_type != SERVER_UPDATE)
+			strins(updates, "{3FA3C4}Update in development:\n", length);
 
 		ShowPlayerDialog(playerid, MV_DIALOG, DIALOG_STYLE_MSGBOX, "Update log", updates, "OK", "");
 	}
