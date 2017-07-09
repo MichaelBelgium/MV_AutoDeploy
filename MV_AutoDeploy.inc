@@ -66,8 +66,8 @@ public CheckServerUpdate()
 				case SERVER_UPDATE_DEV: CallLocalFunction("OnUpcomingUpdateDetected", "isss", id, hash, shash, msg);
 				case SERVER_ISSUE: 
 				{
-					new issueid, priority[16], kind[16];
-					sscanf(hash, "p</>is[16]s[16]", issueid, priority, kind);
+					new issueid, priority[16], kind[64];
+					sscanf(hash, "p</>is[16]s[64]", issueid, priority, kind);
 					CallLocalFunction("OnServerIssueCreated", "isss", issueid, msg, priority, kind);
 				}
 				case SERVER_ISSUE_STATUSCHANGE:

@@ -18,7 +18,7 @@ But to get this to work perfectly you'll need to follow the steps below.
 ### Vps
 * Import table.sql in your database
 * Edit the Config class in deploy.php so it would work for you. Afterwards put deploy.php on the webserver on your vps.
-* Add a webhook to the github/bitbucket page: repo settings > webhooks > add webhook; title free to choose, url should be `http://vps_ip_or_domain.tld/deploy.php`
+* Add a webhook to the github/bitbucket page: repo settings > webhooks > add webhook; title free to choose, url should be `http://vps_ip_or_domain.tld/deploy.php`. It should listen to events: issues (created, updated) and push.
 * Create an empty git repo in your main server gamemode directory: `cd /home/samp/myserver/gamemodes && git init`, if using a test server do the same but afterwards `git checkout <ur dev branch specified in Config and existing on remote/local>`
 * Same like locally, add the git remote link: `git remote add <link>` - yes the same one
 
@@ -37,7 +37,7 @@ OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
 ## To-do
-- Add issue support for github
+- N/A
 
 ## /updates
 
