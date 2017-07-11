@@ -11,7 +11,7 @@
 #define COL_SERVER			"{3FCD02}"
 #define COL_WHITE			"{FFFFFF}"
 
-new gConnection = -1, gTimer = -1;
+new MySQL:gConnection, gTimer = -1;
 
 enum
 {
@@ -27,7 +27,7 @@ forward OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[]);
 forward OnServerIssueCreated(issueid, title[], priority[], kind[]);
 forward OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[]);
 
-MV_AutoDeployInit(sqlCon)
+MV_AutoDeployInit(MySQL:sqlCon)
 {
 	gConnection = sqlCon;
 
@@ -44,16 +44,16 @@ public CheckServerUpdate()
 	new string[256], hash[128], shash[16], msg[128], id, type, bool:needsrestart = false;
 
 	new Cache:result = mysql_query(gConnection, "SELECT uID, Hash, Type, Message FROM Update_Data WHERE Handled = 0 ORDER BY Date DESC");
-	new rows = cache_num_rows(gConnection);
+	new rows = cache_num_rows();
 
 	if(rows > 0)
 	{
 		for(new i = 0; i < rows; i++)
 		{
-			id = cache_get_field_content_int(i, "uID", gConnection);
-			cache_get_field_content(i, "Hash", hash, gConnection);
-			cache_get_field_content(i, "Message", msg, gConnection);
-			type = cache_get_field_content_int(i, "Type", gConnection);
+			cache_get_value_name_int(i, "uID", id);
+			cache_get_value_name(i, "Hash", hash);
+			cache_get_value_name(i, "Message", msg);
+			cache_get_value_name_int(i, "Type", type);
 			strmid(shash, hash, 0, 7);
 
 			switch(type)
@@ -91,7 +91,7 @@ public CheckServerUpdate()
 	else
 		print("No new updates.");
 
-	cache_delete(result, gConnection);
+	cache_delete(result);
 }
 
 CMD:updates(playerid,params[])
@@ -100,12 +100,12 @@ CMD:updates(playerid,params[])
 	new data[3][64], length = 0;
 
 	result = mysql_query(gConnection, "SELECT uID FROM Update_Data WHERE Type = 0 OR Type = 1");
-	totalrows = cache_num_rows(gConnection);
-	cache_delete(result, gConnection);
+	totalrows = cache_num_rows();
+	cache_delete(result);
 
 	mysql_format(gConnection,string, sizeof(string), "SELECT * FROM Update_Data WHERE Type = 0 OR Type = 1 ORDER BY Date DESC LIMIT %i", UPDATES_LIMIT);
 	result = mysql_query(gConnection, string);
-	updaterows = cache_num_rows(gConnection);
+	updaterows = cache_num_rows();
 
 	format(string, sizeof(string), COL_WHITE"There are a total of %i updates.\n\n", totalrows);
 	strcat(updates, string);
@@ -116,12 +116,12 @@ CMD:updates(playerid,params[])
 	{
 		for(new i = 0; i < updaterows; i++)
 		{
-			cache_get_field_content(i, "Hash", data[0], gConnection);
+			cache_get_value_name(i, "Hash", data[0]);
 			strmid(data[0], data[0], 0, 7);
 
-			cache_get_field_content(i, "Message", data[1], gConnection);
-			cache_get_field_content(i, "Date", data[2], gConnection);
-			last_type = cache_get_field_content_int(i, "Type", gConnection);
+			cache_get_value_name(i, "Message", data[1]);
+			cache_get_value_name(i, "Date", data[2]);
+			cache_get_value_name_int(i, "Type", last_type);
 
 			if(last_type == SERVER_UPDATE)
 				format(string, sizeof(string), COL_WHITE"[%s] "COL_SERVER"'%s' "COL_WHITE"at "COL_PARAM"%s\n", data[0], data[1], data[2]);
@@ -139,6 +139,6 @@ CMD:updates(playerid,params[])
 	else
 		SendClientMessage(playerid, -1, "No updates.");
 
-	cache_delete(result, gConnection);
+	cache_delete(result);
 	return 1;
 }

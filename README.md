@@ -32,7 +32,7 @@ OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[])
 OnServerIssueCreated(issueid, title[], priority[], kind[])
 OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 ```
-* In general: the requirements are the SQL plugin and zcmd include.
+* In general: the requirements are the [SQL plugin (R41-2)](https://github.com/pBlueG/SA-MP-MySQL/releases) and zcmd include.
 
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
