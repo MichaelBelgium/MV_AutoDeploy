@@ -96,8 +96,8 @@ public CheckServerUpdate()
 
 CMD:updates(playerid,params[])
 {
-	new updates[256*5],string[128], Cache:result, totalrows, updaterows, last_type;
-	new data[3][64], length = 0;
+	new updates[256*5],string[256], Cache:result, totalrows, updaterows, last_type;
+	new data[3][128], length = 0;
 
 	result = mysql_query(gConnection, "SELECT uID FROM Update_Data WHERE Type = 0 OR Type = 1");
 	totalrows = cache_num_rows();
@@ -140,5 +140,50 @@ CMD:updates(playerid,params[])
 		SendClientMessage(playerid, -1, "No updates.");
 
 	cache_delete(result);
+	return 1;
+}
+
+CMD:issues(playerid,params[])
+{
+	new issues[256*5], string[128], Cache:result, rows = 0, Cache:old;
+	new data[3][64], issueid, issuedata[2][16];
+
+	result = mysql_query(gConnection, "SELECT Hash, Message, Date FROM Update_Data WHERE Type = 2 ORDER BY Date DESC LIMIT "#UPDATES_LIMIT);
+	rows = cache_num_rows();
+	old = cache_save();
+
+	if(rows > 0)
+	{
+		for(new i = 0; i < rows; i++)
+		{
+			cache_get_value_name(i, "Hash", data[0]);
+			cache_get_value_name(i, "Message", data[1]);
+			cache_get_value_name(i, "Date", data[2]);
+
+			sscanf(data[0], "p</>iss", issueid, issuedata[0], issuedata[1]);
+
+			format(string, sizeof(string), COL_SERVER"Issue: "COL_WHITE"%i\t%s\t[%s - %s] "COL_SERVER"%s\n", issueid, data[2], issuedata[0], issuedata[1], data[1]);
+			strcat(issues, string);
+
+			mysql_format(gConnection, string, sizeof(string), "SELECT Date FROM Update_Data WHERE (Hash LIKE '%i/resolved%%' OR Hash LIKE '%i/closed%%') AND Type = 3", issueid, issueid);
+			result = mysql_query(gConnection, string);
+
+			if(cache_num_rows())
+			{
+				cache_get_value_name(0, "Date", data[2]);
+				format(string, sizeof(string), COL_SERVER"\t» Fixed at "COL_WHITE"%s\n\n",data[2]);
+				strcat(issues, string);
+			}
+
+			cache_delete(result);
+			cache_set_active(old);
+		}
+	}
+	else
+		issues = "No issues.";
+
+	cache_delete(old);
+
+	ShowPlayerDialog(playerid, MV_DIALOG, DIALOG_STYLE_MSGBOX, "Latest issues", issues, "OK", "");
 	return 1;
 }
