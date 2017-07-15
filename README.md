@@ -39,8 +39,10 @@ Follow these in order, first we set up things locally then on vps and afterwards
 ## To-do
 - N/A
 
-## /updates
+## Extra commands
 
-**[MV]_AutoDeploy gives you one more command: /updates - Lists the last 10 updates from the server/git**
+**[MV]_AutoDeploy gives you extra commands: /updates and /issues - Lists the last 10 updates/issues from the server/git**
 
 ![updates command](http://puu.sh/vOVWv.jpg)
+
+![issue command](https://puu.sh/wK8su.jpg)
