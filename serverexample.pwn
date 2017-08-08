@@ -8,7 +8,7 @@
 #define SQL_DB          ""
 #define SQL_SERVER      "127.0.0.1"
 
-new gCon = -1;
+new MySQL:gCon;
 
 main()
 {
@@ -17,7 +17,7 @@ main()
 	print("----------------------------------\n");
 }
 
-	public OnGameModeInit()
+public OnGameModeInit()
 {
 	SetGameModeText("Test Script");
 
