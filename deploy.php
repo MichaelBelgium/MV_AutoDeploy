@@ -31,13 +31,19 @@
 	{
 		if(property_exists($payload, "push"))
 		{
-			$hash = $payload->push->changes[0]->new->target->hash;
-			$date = date( "Y-m-d H:i:s", strtotime($payload->push->changes[0]->new->target->date));
-			$message =  preg_replace('/\s+/', ' ', trim($payload->push->changes[0]->new->target->message));
 			if($payload->push->changes[0]->new->name == Config::DEV_BRANCH)
 				$type = Config::SERVER_UPDATE_DEV;
 			else
 				$type = Config::SERVER_UPDATE;
+			
+			foreach ($payload->push->changes[0]->commits as $commit) 
+			{
+				$hash = $commit->hash;
+				$date = date("Y-m-d H:i:s", strtotime($commit->date));
+				$message = $commit->message;
+
+				save($type, $hash, $date, $message);
+			}
 		}
 		else if(property_exists($payload, "changes"))
 		{
@@ -100,11 +106,7 @@
 		}
 	}
 
-	$check = $con->query("SELECT Hash FROM Update_Data WHERE Hash = '$hash'");
-	if($check->num_rows > 0 || empty($hash)) exit;
-
-	$message = $con->real_escape_string($message);
-	$con->query("INSERT INTO Update_Data (Hash, Message, Type, Date) VALUES ('$hash', '$message', $type, '$date')"); 
+	save($type, $hash, $date, $message);
 
 	$ssh = ssh2_connect(Config::SSH_HOST);
 	ssh2_auth_password($ssh, Config::SSH_USER, Config::SSH_PASS);
@@ -126,4 +128,14 @@
     // stream_set_blocking($errstr, true);
     // echo "| Output: " . stream_get_contents($str);
     // echo "| Error: " . stream_get_contents($errstr);
+
+    function save(int $type, string $hash, string $date, string $message)
+	{
+		global $con;
+		$check = $con->query("SELECT Hash FROM Update_Data WHERE Hash = '$hash'");
+		if($check->num_rows > 0 || empty($hash)) return;
+
+		$message = $con->real_escape_string($message);
+		$con->query("INSERT INTO Update_Data (Hash, Message, Type, Date) VALUES ('$hash', '$message', $type, '$date')"); 
+	}
 ?>
