@@ -40,7 +40,7 @@
 			{
 				$hash = $commit->hash;
 				$date = date("Y-m-d H:i:s", strtotime($commit->date));
-				$message = $commit->message;
+				$message = trim($commit->message);
 
 				save($type, $hash, $date, $message);
 			}
