@@ -17,8 +17,8 @@ But to get this to work perfectly you'll need to follow the steps below.
 
 ### Vps (`/web`)
 * Import `table.sql` in your database
-* Edit the Config class in `deploy.php` so it would work for you. Afterwards put `deploy.php` on the webserver on your vps.
-* Add a webhook to your online repository with link `http://vps_ip_or_domain.tld/deploy.php`. (Most likely: repo settings > webhooks > add webhook; It should listen to events: issues (created, updated) and push.)
+* Edit the config file `config.php` so it would work for you. Afterwards put that file **and** one of the `deploy_*.php` files on your vps (depending on your git hosting service)
+* Add a webhook to your online repository with link `http://vps_ip_or_domain.tld/deploy.php`. (It should listen to the events issues (created, updated) and push.)
 * Create an empty git repo in the same directory like you did locally: `cd myserver/foo/bar && git init`
   * if using a test server do the same but afterwards `git checkout <ur dev branch specified in Config and existing on remote/local>`
 * Also same like locally, add the git remote link: `git remote add <link>` - exactly the same one
@@ -38,7 +38,9 @@ OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 Follow these in order, first we set up things locally then on vps and afterwards on our server. After these steps you should be good to go.
 
 ## To-do
-- N/A
+Feel free to contribute and do a PR or suggest something *hint*
+
+* More deploy file for different git hosting services (eg `deploy_gitlab.php`)
 
 ## Extra commands
 
