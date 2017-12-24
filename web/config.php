@@ -19,6 +19,7 @@ class Config
 	const SERVER_UPDATE_DEV = 1;
 	const SERVER_ISSUE = 2;
 	const SERVER_ISSUE_STATUSCHANGE = 3;
+	const SERVER_TAG = 4;
 }
 
 $con = new mysqli(Config::MYSQL_HOST, Config::MYSQL_USER, Config::MYSQL_PASS, Config::MYSQL_DB);
@@ -28,10 +29,13 @@ function save(int $type, string $hash, string $date, string $message)
 {
 	global $con;
 
-	$check = $con->query("SELECT Hash FROM Update_Data WHERE Hash = '$hash'");
-	if($check->num_rows > 0 || empty($hash)) return;
+	if($type !== Config::SERVER_TAG)
+	{
+		$check = $con->query("SELECT Hash FROM Update_Data WHERE Hash = '$hash'");
+		if($check->num_rows > 0 || empty($hash)) return;
+	}
 
 	$message = $con->real_escape_string($message);
-	$con->query("INSERT INTO Update_Data (Hash, Message, Type, Date) VALUES ('$hash', '$message', $type, '$date')"); 
+	$con->query("INSERT INTO Update_Data (Hash, Message, Type, Date) VALUES ('$hash', '$message', $type, '$date')");
 }
 ?>

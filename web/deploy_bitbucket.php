@@ -5,18 +5,28 @@ $payload = json_decode(file_get_contents('php://input'));
 
 if(property_exists($payload, "push"))
 {
-	if($payload->push->changes[0]->new->name == Config::DEV_BRANCH)
-		$type = Config::SERVER_UPDATE_DEV;
-	else
-		$type = Config::SERVER_UPDATE;
-	
-	foreach ($payload->push->changes[0]->commits as $commit) 
+	if($payload->push->changes[0]->new->type == "tag")
 	{
-		$hash = $commit->hash;
-		$date = date("Y-m-d H:i:s", strtotime($commit->date));
-		$message = trim($commit->message);
+		$type = Config::SERVER_TAG;
+		$hash = $payload->push->changes[0]->new->target->hash;
+		$date = date("Y-m-d H:i:s", strtotime("now"));
+		$message = $payload->push->changes[0]->new->name;
+	}
+	else
+	{
+		if($payload->push->changes[0]->new->name == Config::DEV_BRANCH)
+			$type = Config::SERVER_UPDATE_DEV;
+		else
+			$type = Config::SERVER_UPDATE;
 
-		save($type, $hash, $date, $message);
+		foreach ($payload->push->changes[0]->commits as $commit)
+		{
+			$hash = $commit->hash;
+			$date = date("Y-m-d H:i:s", strtotime($commit->date));
+			$message = trim($commit->message);
+
+			save($type, $hash, $date, $message);
+		}
 	}
 }
 else if(property_exists($payload, "changes"))

@@ -1,6 +1,6 @@
 # SAMP-Auto-Update-Git
 
-This is a way to auto-deploy a server (gamemode) to your VPS. When pushing to bitbucket (or github) it'll automaticly update the gamemode files on the vps thanks to a webhook. If the sa-mp server detects there's an update (that you pushed to the master branch) - the server will restart itself (with gmx). 
+This is a way to auto-deploy a server (gamemode) to your VPS. When pushing to bitbucket (or github) it'll automaticly update the gamemode files on the vps thanks to a webhook. If the sa-mp server detects there's an update (that you pushed to the master branch) - the server will restart itself (with gmx).
 
 Next to this it also tracks your git issues. When an issues gets created and when the status of it gets changed.
 
@@ -41,6 +41,7 @@ Follow these in order, first we set up things locally then on vps and afterwards
 Feel free to contribute and do a PR or suggest something *hint*
 
 * More deploy file for different git hosting services (eg `deploy_gitlab.php`)
+* Tag support for github
 
 ## Extra commands
 

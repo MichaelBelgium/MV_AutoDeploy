@@ -8,6 +8,8 @@
 #define SQL_DB          ""
 #define SQL_SERVER      "127.0.0.1"
 
+#define SERVER_NAME 	"My server"
+
 new MySQL:gCon;
 
 main()
@@ -22,7 +24,7 @@ public OnGameModeInit()
 	SetGameModeText("Test Script");
 
 	gCon = mysql_connect(SQL_SERVER, SQL_USER, SQL_DB, SQL_PASSWORD);
-	if(mysql_errno(gCon) != 0)	
+	if(mysql_errno(gCon) != 0)
 		printf("Could not connect to database %s!", SQL_DB);
 	else
 		MV_AutoDeployInit(gCon);
@@ -68,5 +70,13 @@ public OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 	format(string, sizeof(string), "Issue updated: %s (http://bitbucket.org/MichaelBelgium/lmdm/issues/%i) - Status changed from '%s' to '%s'", title, issueid, oldstatus, newstatus);
 	SendClientMessageToAll(-1, string);
 	print(string);
+	return 1;
+}
+
+public OnServerTagCreated(updateid, linkedothash[], tagname[])
+{
+	new version[128];
+	format(version, sizeof(version), "%s %s", SERVER_NAME, tagname);
+	SetGameModeText(version);
 	return 1;
 }

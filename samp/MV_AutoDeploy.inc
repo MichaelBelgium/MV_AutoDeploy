@@ -18,7 +18,8 @@ enum
 	SERVER_UPDATE,
 	SERVER_UPDATE_DEV,
 	SERVER_ISSUE,
-	SERVER_ISSUE_STATUSCHANGE
+	SERVER_ISSUE_STATUSCHANGE,
+	SERVER_TAG
 };
 
 forward CheckServerUpdate();
@@ -26,6 +27,7 @@ forward OnServerUpdateDetected(updateid, hash[], shorthash[], message[]);
 forward OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[]);
 forward OnServerIssueCreated(issueid, title[], priority[], kind[]);
 forward OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[]);
+forward OnServerTagCreated(updateid, linkedtohash[], tagname[]);
 
 MV_AutoDeployInit(MySQL:sqlCon)
 {
@@ -64,7 +66,7 @@ public CheckServerUpdate()
 					needsrestart = true;
 				}
 				case SERVER_UPDATE_DEV: CallLocalFunction("OnUpcomingUpdateDetected", "isss", id, hash, shash, msg);
-				case SERVER_ISSUE: 
+				case SERVER_ISSUE:
 				{
 					new issueid, priority[16], kind[64];
 					sscanf(hash, "p</>is[16]s[64]", issueid, priority, kind);
@@ -76,8 +78,9 @@ public CheckServerUpdate()
 					sscanf(hash, "p</>is[16]s[16]", issueid, newstatus, oldstatus);
 					CallLocalFunction("OnServerIssueStatusChange", "isss", issueid, msg, oldstatus, newstatus);
 				}
+				case SERVER_TAG: CallLocalFunction("OnServerTagCreated", "iss", id, hash, msg);
 			}
-			
+
 			mysql_format(gConnection, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);
 			mysql_query(gConnection, string, false);
 		}
