@@ -35,6 +35,7 @@ function save(int $type, string $hash, string $date, string $message)
 		if($check->num_rows > 0 || empty($hash)) return;
 	}
 
+	$message = preg_replace('/\s+/', ' ', $message);
 	$message = $con->real_escape_string($message);
 	$con->query("INSERT INTO Update_Data (Hash, Message, Type, Date) VALUES ('$hash', '$message', $type, '$date')");
 }
