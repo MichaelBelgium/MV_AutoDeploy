@@ -10,7 +10,7 @@ class Config
 	const SSH_USER = ""; 
 	const SSH_PASS = ""; 
 	const SSH_GIT_DIR = "/home/myserver/gamemodes"; 
-	const SSH_TEST_GIT_DIR = "/home/mytestserver/gamemodes";
+	const SSH_TEST_GIT_DIR = null;
 
 	const DEV_BRANCH = "dev";
 
