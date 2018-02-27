@@ -10,15 +10,18 @@ But to get this to work perfectly you'll need to follow the steps below.
 
 ### Local:
 * Create an repository on any git hosting service (bitbucket, github, gitlab, ...)
-* Create an empty git repo in your server gamemodes folder by doing: `git init`
+* Create an empty git repo in your server folder by doing: `git init` (or in gamemodes folder, as long your .amx is bieng pushed to git)
 * Add the git remote link to the repo: `git remote add <link>`
-* Optional: make a .gitignore and ignore all the files except your gamemode files you need (.amx (and .pwn))
+* Optional: make a .gitignore and ignore all the files except your gamemode/include files you want to keep track of
 * Do a first `git add .` and `git commit -m "Initial commit"` and `git push origin master` so you have your current version of the gamemode on your origin
 
 ### Vps (`/web`)
 * Import `table.sql` in your database
 * Edit the config file `config.php` so it would work for you. Afterwards put that file **and** one of the `deploy_*.php` files on your vps (depending on your git hosting service)
-* Add a webhook to your online repository with link `http://vps_ip_or_domain.tld/deploy.php`. (It should listen to the events issues (created, updated) and push.)
+* Add a webhook to your online repository with link `http://vps_ip_or_domain.tld/deploy_{service}.php`. (It should listen to the events: issues (created, updated) and push.)
+  * The webhook should listen to the events:
+    * bitbucket: repo push, issue created, issue updated
+    * github: create, push, issues
 * Create an empty git repo in the same directory like you did locally: `cd myserver/foo/bar && git init`
   * if using a test server do the same but afterwards `git checkout <ur dev branch specified in Config and existing on remote/local>`
 * Also same like locally, add the git remote link: `git remote add <link>` - exactly the same one
@@ -32,6 +35,7 @@ OnServerUpdateDetected(id, hash[], shorthash[], message[])
 OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[])
 OnServerIssueCreated(issueid, title[], priority[], kind[])
 OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
+OnServerTagCreated(updateid, linkedtohash[], tagname[])
 ```
 * In general: the requirements are the [SQL plugin (R41-2)](https://github.com/pBlueG/SA-MP-MySQL/releases) and zcmd include.
 
