@@ -10,9 +10,10 @@ class Config
 	const SSH_USER = ""; 
 	const SSH_PASS = ""; 
 	const SSH_GIT_DIR = "/home/myserver/gamemodes"; 
-	const SSH_TEST_GIT_DIR = null;
+	const SSH_TEST_GIT_DIR = null; //same thing like above, but with a test server (null = no test server)
 
 	const DEV_BRANCH = "dev";
+	const GIT_AMX_PATH = null; //the path on your git repository to the amx file of your gamemode (php will only pull that file on update)
 
 	//no need to change these:
 	const SERVER_UPDATE = 0;
