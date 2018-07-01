@@ -1,6 +1,7 @@
 <?php
 require "config.php";
 
+$pushed_to_branch = null;
 $payload = json_decode(file_get_contents('php://input'));
 
 if(property_exists($payload, "issue"))
@@ -38,13 +39,15 @@ else if(property_exists($payload, "head_commit"))
 	$date = date( "Y-m-d H:i:s", strtotime($payload->head_commit->timestamp));
 	$message = $payload->head_commit->message;
 
-	if(explode("/",$payload->ref)[2] == Config::DEV_BRANCH)
-		$type = Config::SERVER_UPDATE_DEV;
-	else
+	$pushed_to_branch = explode("/",$payload->ref)[2];
+	
+	if($pushed_to_branch == Config::MASTER_BRANCH)
 		$type = Config::SERVER_UPDATE;
+	else
+		$type = Config::SERVER_UPDATE_DEV;
 }
 
 save($type, $hash, $date, $message);
 
-require "ssh2.php";
+include "ssh2.php";
 ?>

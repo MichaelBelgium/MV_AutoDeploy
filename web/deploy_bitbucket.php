@@ -1,6 +1,7 @@
 <?php
 require "config.php";
 
+$pushed_to_branch = null;
 $payload = json_decode(file_get_contents('php://input'));
 
 if(property_exists($payload, "push"))
@@ -14,10 +15,12 @@ if(property_exists($payload, "push"))
 	}
 	else
 	{
-		if($payload->push->changes[0]->new->name == Config::DEV_BRANCH)
-			$type = Config::SERVER_UPDATE_DEV;
-		else
+		$pushed_to_branch = $payload->push->changes[0]->new->name;
+
+		if($pushed_to_branch == Config::MASTER_BRANCH)
 			$type = Config::SERVER_UPDATE;
+		else
+			$type = Config::SERVER_UPDATE_DEV;
 
 		foreach ($payload->push->changes[0]->commits as $commit)
 		{
@@ -48,5 +51,5 @@ else if(property_exists($payload, "issue"))
 
 save($type, $hash, $date, $message);
 
-require "ssh2.php";
+include "ssh2.php";
 ?>

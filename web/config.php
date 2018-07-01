@@ -9,13 +9,19 @@ class Config
 	const SSH_HOST = "127.0.0.1";
 	const SSH_USER = ""; 
 	const SSH_PASS = ""; 
+	
 	const SSH_GIT_DIR = "/home/myserver/gamemodes"; 
-	const SSH_TEST_GIT_DIR = null; //same thing like above, but with a test server (null = no test server)
+	//same thing like above, but with a test server (null = no test server)
+	//setting to null will disable the ssh part/the git pull to auto-deploy 
+	const SSH_TEST_GIT_DIR = null; 
 
-	const DEV_BRANCH = "dev";
-	const GIT_AMX_PATH = null; //the path on your git repository to the amx file of your gamemode (php will only pull that file on update)
+	const MASTER_BRANCH = "master"; //your main branch on git
 
-	//no need to change these:
+	//the path on your git repository to the amx file of your gamemode (php will only pull that file on update)
+	//setting to null will disable the ssh part/the git pull to auto-deploy 
+	const GIT_AMX_PATH = null; 
+
+	//basicly no need to change these, if you do - change the values in the include also so they match:
 	const SERVER_UPDATE = 0;
 	const SERVER_UPDATE_DEV = 1;
 	const SERVER_ISSUE = 2;
