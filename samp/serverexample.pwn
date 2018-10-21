@@ -21,13 +21,15 @@ main()
 
 public OnGameModeInit()
 {
-	SetGameModeText("Test Script");
-
 	gCon = mysql_connect(SQL_SERVER, SQL_USER, SQL_DB, SQL_PASSWORD);
 	if(mysql_errno(gCon) != 0)
 		printf("Could not connect to database %s!", SQL_DB);
 	else
 		MV_AutoDeployInit(gCon);
+
+	printf("Server loaded, running version %s", MV_GetServerVersion());
+
+	SetGameModeText(GetCurrentServerVersion());
 	return 1;
 }
 
@@ -73,10 +75,16 @@ public OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 	return 1;
 }
 
-public OnServerTagCreated(updateid, linkedothash[], tagname[])
+public OnServerTagCreated(updateid, linkedtohash[], tagname[])
+{
+	SetGameModeText(GetCurrentServerVersion());
+	return 1;
+}
+
+GetCurrentServerVersion()
 {
 	new version[128];
-	format(version, sizeof(version), "%s %s", SERVER_NAME, tagname);
-	SetGameModeText(version);
-	return 1;
+	format(version, sizeof(version), "%s %s", SERVER_NAME, MV_GetServerVersion());
+
+	return version;
 }

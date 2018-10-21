@@ -12,7 +12,7 @@
 #define COL_SERVER			"{3FCD02}"
 #define COL_WHITE			"{FFFFFF}"
 
-new MySQL:gConnection, gTimer = -1;
+new MySQL:gConnection, gTimer = -1, gVersion[64];;
 
 enum
 {
@@ -40,6 +40,34 @@ MV_AutoDeployInit(MySQL:sqlCon)
 MV_AutoDeployExit()
 {
 	KillTimer(gTimer);
+}
+
+/** 
+Gets the latest tag + message and gives it back as a server version
+Set force to true to get the latest version from the database
+**/
+MV_GetServerVersion(bool:force = false)
+{
+	if(strlen(gVersion) == 0 || force)
+	{
+		new Cache:result = mysql_query(gConnection, "SELECT Hash, Message FROM Update_Data WHERE Type = 4 AND Handled = 1 ORDER BY Date DESC LIMIT 1");
+		if(cache_num_rows() == 0)
+			format(gVersion, sizeof(gVersion), "%s", "Unknown");
+		else
+		{
+			new data[2][256], shash[16];
+			
+			cache_get_value_name(0, "Hash", data[0]);
+			cache_get_value_name(0, "Message", data[1]);
+
+			strmid(shash, data[0], 0, 7);
+
+			format(gVersion, sizeof(gVersion), "%s-%s", data[1], shash);
+		}
+		cache_delete(result);
+	}
+
+	return gVersion;
 }
 
 public CheckServerUpdate()
@@ -79,7 +107,11 @@ public CheckServerUpdate()
 					sscanf(hash, "p</>is[16]s[16]", issueid, newstatus, oldstatus);
 					CallLocalFunction("OnServerIssueStatusChange", "isss", issueid, msg, oldstatus, newstatus);
 				}
-				case SERVER_TAG: CallLocalFunction("OnServerTagCreated", "iss", id, hash, msg);
+				case SERVER_TAG:
+				{
+					MV_GetServerVersion(true);
+					CallLocalFunction("OnServerTagCreated", "iss", id, hash, msg);
+				}
 			}
 
 			mysql_format(gConnection, string, sizeof(string), "UPDATE Update_Data SET Handled = 1 WHERE uID = %i", id);

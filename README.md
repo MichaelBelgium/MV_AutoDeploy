@@ -29,13 +29,17 @@ But to get this to work perfectly you'll need to follow the steps below.
 ### Server (`/samp`)
 * Download `MV_AutoDeploy` in your includes folder
 * Put `#include <MV_AutoDeploy>` in your gamemode or filterscript.
-* U can use the following callbacks like the example script (`serverexample.pwn`)
+* U can use the following callbacks and functions like the example script (`serverexample.pwn`)
 ```
 OnServerUpdateDetected(id, hash[], shorthash[], message[])
 OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[])
 OnServerIssueCreated(issueid, title[], priority[], kind[])
 OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 OnServerTagCreated(updateid, linkedtohash[], tagname[])
+
+MV_AutoDeployInit(MySQL:sqlCon)
+MV_AutoDeployExit()
+MV_GetServerVersion()
 ```
 * In general: the requirements are the [SQL plugin (R41-2)](https://github.com/pBlueG/SA-MP-MySQL/releases) and zcmd include.
 
