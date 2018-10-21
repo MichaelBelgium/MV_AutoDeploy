@@ -6,6 +6,7 @@
 #define CHECK_UPDATE		30		//check every x minutes for update
 #define MV_DIALOG			898		//choose a dialogid without response
 #define UPDATES_LIMIT		10		//Last x commits will be shown in /updates
+#define RESTART_ON_UPDATE	true 	//restart the server automaticly when an update get pushed
 
 #define COL_PARAM			"{AFE7FF}"
 #define COL_SERVER			"{3FCD02}"
@@ -63,7 +64,7 @@ public CheckServerUpdate()
 				case SERVER_UPDATE:
 				{
 					CallLocalFunction("OnServerUpdateDetected", "isss", id, hash, shash, msg);
-					needsrestart = true;
+					needsrestart = RESTART_ON_UPDATE;
 				}
 				case SERVER_UPDATE_DEV: CallLocalFunction("OnUpcomingUpdateDetected", "isss", id, hash, shash, msg);
 				case SERVER_ISSUE:
@@ -91,8 +92,6 @@ public CheckServerUpdate()
 			SendRconCommand("gmx");
 		}
 	}
-	else
-		print("No new updates.");
 
 	cache_delete(result);
 }

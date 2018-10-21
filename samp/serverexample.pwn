@@ -58,7 +58,7 @@ public OnUpcomingUpdateDetected(updateid, hash[], shorthash[], message[])
 public OnServerIssueCreated(issueid, title[], priority[], kind[])
 {
 	new string[256];
-	format(string, sizeof(string), "New issue detected: %s ( http://bitbucket.org/MichaelBelgium/lmdm/issues/%i ) - Kind: %s - Priority: %s", title, issueid, kind, priority);
+	format(string, sizeof(string), "New issue detected: %s ( http://bitbucket.org/MichaelBelgium/foobar/issues/%i ) - Kind: %s - Priority: %s", title, issueid, kind, priority);
 	SendClientMessageToAll(-1, string);
 	print(string);
 	return 1;
@@ -67,7 +67,7 @@ public OnServerIssueCreated(issueid, title[], priority[], kind[])
 public OnServerIssueStatusChange(issueid, title[], oldstatus[], newstatus[])
 {
 	new string[256];
-	format(string, sizeof(string), "Issue updated: %s (http://bitbucket.org/MichaelBelgium/lmdm/issues/%i) - Status changed from '%s' to '%s'", title, issueid, oldstatus, newstatus);
+	format(string, sizeof(string), "Issue updated: %s (http://bitbucket.org/MichaelBelgium/foobar/issues/%i) - Status changed from '%s' to '%s'", title, issueid, oldstatus, newstatus);
 	SendClientMessageToAll(-1, string);
 	print(string);
 	return 1;
