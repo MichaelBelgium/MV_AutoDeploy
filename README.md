@@ -49,7 +49,7 @@ Follow these in order, first we set up things locally then on vps and afterwards
 Feel free to contribute and do a PR or suggest something *hint*
 
 * More deploy file for different git hosting services (eg `deploy_gitlab.php`)
-* Tag support for github
+* Github webhooks do **NOT** provide a hash of a commit when a tag get created. You will need to edit the row manually
 
 ## Extra commands
 

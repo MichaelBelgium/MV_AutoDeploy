@@ -46,6 +46,16 @@ else if(property_exists($payload, "head_commit"))
 	else
 		$type = Config::SERVER_UPDATE_DEV;
 }
+else if(property_exists($payload, "ref_type"))
+{
+	if($payload->ref_type === "tag")
+	{
+		$message = $payload->ref;
+		$date = date( "Y-m-d H:i:s");
+		$hash = "Unknown"; //github webhook doesn't provide the hash where the tag got created. You'll need to do it manually
+		$type = Config::SERVER_TAG;
+	}
+}
 
 save($type, $hash, $date, $message);
 
