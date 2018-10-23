@@ -50,7 +50,7 @@ MV_GetServerVersion(bool:force = false)
 {
 	if(strlen(gVersion) == 0 || force)
 	{
-		new Cache:result = mysql_query(gConnection, "SELECT Hash, Message FROM Update_Data WHERE Type = 4 AND Handled = 1 ORDER BY Date DESC LIMIT 1");
+		new Cache:result = mysql_query(gConnection, "SELECT Hash, Message FROM Update_Data WHERE Type = 4 ORDER BY Date DESC LIMIT 1");
 		if(cache_num_rows() == 0)
 			format(gVersion, sizeof(gVersion), "%s", "Unknown");
 		else
